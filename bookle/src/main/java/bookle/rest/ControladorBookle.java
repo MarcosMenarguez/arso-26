@@ -6,6 +6,8 @@ import java.time.format.DateTimeParseException;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -24,6 +26,7 @@ import bookle.modelo.Actividad;
 import bookle.rest.Listado.ResumenExtendido;
 import bookle.servicio.ActividadResumen;
 import bookle.servicio.IServicioBookle;
+import io.jsonwebtoken.Claims;
 import servicio.FactoriaServicios;
 
 @Path("actividades")
@@ -33,18 +36,30 @@ public class ControladorBookle {
 
 	@Context
 	private UriInfo uriInfo;
+	
+	@Context
+	private HttpServletRequest servletRequest;
 
 	// http://localhost:8080/api/actividades/1
 
+	// curl -X GET -H "Authorization: Bearer %token_jwt%" http://localhost:8080/api/actividades/1
+	
 	@GET
 	@Path("{id}")
 	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@RolesAllowed("PROFESOR")
 	public Response getActividad(@PathParam("id") String id) throws Exception {
 
+		if (this.servletRequest.getAttribute("claims") != null) {		 
+			 Claims claims = (Claims) this.servletRequest.getAttribute("claims");
+			 System.out.println("Usuario autenticado: " + claims.getSubject());
+			 System.out.println("Roles: " + claims.get("roles"));
+		}
+		
 		return Response.status(Response.Status.OK).entity(servicio.recuperar(id)).build();
 	}
 
-	// curl -i -X PUT -H "Content-type: application/xml" -d @test-files/1.xml http://localhost:8080/api/actividades/1
+	// curl -i -X PUT -H "Content-type: application/xml" -d @1.xml http://localhost:8080/api/actividades/1
 
 	@PUT
 	@Path("/{id}")
@@ -66,7 +81,7 @@ public class ControladorBookle {
 		return Response.status(Response.Status.NO_CONTENT).build();
 	}
 
-	// curl -i -X POST -H "Content-type: application/xml" -d @test-files/1.xml http://localhost:8080/api/actividades/
+	// curl -i -X POST -H "Content-type: application/xml" -d @1.xml http://localhost:8080/api/actividades/
 
 	@POST
 	@Consumes(MediaType.APPLICATION_XML)
@@ -76,7 +91,7 @@ public class ControladorBookle {
 		return Response.created(nuevaURL).build();
 	}
 
-	// curl -i -X POST --data "alumno=Pepe&email=pepe@um.es" http://localhost:8080/api/actividades/1/agenda/2026-02-16/turnos/1/reserva
+	// curl -i -X POST --data "alumno=Pepe&email=pepe@um.es" http://localhost:8080/api/actividades/1/agenda/2026-02-14/turnos/1/reserva
 
 	@POST
 	@Path("/{id}/agenda/{fecha}/turnos/{indice}/reserva")
