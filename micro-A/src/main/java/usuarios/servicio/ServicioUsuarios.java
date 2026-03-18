@@ -1,17 +1,24 @@
 package usuarios.servicio;
 
+import java.io.IOException;
+
 import repositorio.EntidadNoEncontrada;
 import repositorio.FactoriaRepositorios;
 import repositorio.Repositorio;
 import repositorio.RepositorioException;
+import servicio.FactoriaServicios;
+import usuarios.eventos.EventoUsuarioCreado;
 import usuarios.modelo.Usuario;
+import usuarios.puertos.PublicadorEventos;
 
 public class ServicioUsuarios implements IServicioUsuarios {
 
 	private Repositorio<Usuario, String> repositorio = FactoriaRepositorios.getRepositorio(Usuario.class);
 
+	private PublicadorEventos publicador = FactoriaServicios.getServicio(PublicadorEventos.class);
+	
 	@Override
-	public void crear(String email, String nombre) throws RepositorioException {
+	public void crear(String email, String nombre) throws RepositorioException, IOException {
 
 		if (email == null || email.isEmpty())
 			throw new IllegalArgumentException("email: no se acepta nulo o vacío");
@@ -22,6 +29,10 @@ public class ServicioUsuarios implements IServicioUsuarios {
 		Usuario usuario = new Usuario(email, nombre);
 		
 		repositorio.add(usuario);
+		
+		// notificar evento
+		EventoUsuarioCreado evento = new EventoUsuarioCreado(email, nombre);
+		this.publicador.publicarEvento(evento);
 		
 	}
 
