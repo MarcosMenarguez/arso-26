@@ -7,6 +7,7 @@ import documentos.modelo.Usuario;
 import documentos.repositorio.RepositorioUsuarios;
 
 // Puerto de entrada
+// Adaptador en el paquete "adaptadores"
 
 @Component
 public class ManejadorEventos {

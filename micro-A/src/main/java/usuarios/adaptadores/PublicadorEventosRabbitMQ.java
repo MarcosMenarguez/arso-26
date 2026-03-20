@@ -1,4 +1,4 @@
-package usuarios.puertos;
+package usuarios.adaptadores;
 
 import java.io.IOException;
 
@@ -9,8 +9,9 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
 import usuarios.eventos.Evento;
+import usuarios.puertos.PublicadorEventos;
 
-// Adaptador
+// Adaptador del puerto de salida del publicador de eventos
 public class PublicadorEventosRabbitMQ implements PublicadorEventos {
 
 	public PublicadorEventosRabbitMQ() {
@@ -34,8 +35,7 @@ public class PublicadorEventosRabbitMQ implements PublicadorEventos {
 			}
 			catch(Exception e) {
 				throw new RuntimeException(e);
-			}
-		
+			}		
 		
 	}
 	

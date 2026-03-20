@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import documentos.eventos.EventoDocumentoCreado;
 import documentos.modelo.Documento;
 import documentos.modelo.Usuario;
+import documentos.puertos.PublicadorEventos;
 import documentos.repositorio.RepositorioDocumentos;
 import documentos.repositorio.RepositorioUsuarios;
 import repositorio.EntidadNoEncontrada;
@@ -19,11 +21,15 @@ public class ServicioDocumentos implements IServicioDocumentos {
 
 	private RepositorioDocumentos repositorioDocumentos;
 	private RepositorioUsuarios repositorioUsuarios;
+	
+	private PublicadorEventos publicadorEventos;
 
 	@Autowired
-	public ServicioDocumentos(RepositorioDocumentos repositorio, RepositorioUsuarios repositorioUsuarios) {
+	public ServicioDocumentos(RepositorioDocumentos repositorio, RepositorioUsuarios repositorioUsuarios,
+			PublicadorEventos publicadorEventos) {
 		this.repositorioDocumentos = repositorio;
 		this.repositorioUsuarios = repositorioUsuarios;
+		this.publicadorEventos = publicadorEventos;
 		
 		// crea un usuario de pruebas
 		
@@ -52,6 +58,11 @@ public class ServicioDocumentos implements IServicioDocumentos {
 
 		Long id = repositorioDocumentos.save(encuesta).getId();
 
+		// notificar evento
+		EventoDocumentoCreado evento = 
+				new EventoDocumentoCreado(id.toString(), titulo, email);
+		this.publicadorEventos.publicarEvento(evento);
+		
 		return id;
 	}
 

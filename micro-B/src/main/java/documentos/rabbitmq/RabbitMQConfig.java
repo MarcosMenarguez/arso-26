@@ -1,4 +1,4 @@
-package documentos.test.rabbitmq;
+package documentos.rabbitmq;
 
 import java.util.Map;
 
@@ -38,6 +38,8 @@ public class RabbitMQConfig {
 	    boolean autodelete = false;
 	    return new Queue(QUEUE_NAME, durable, exclusive, autodelete);
 	  }
+	  
+	  // Importante: se declararán tantos métodos "bind" como suscripciones a eventos de microservicios
 	  
 	  @Bean
 	  public Binding binding(Queue queue, Exchange exchange) {
